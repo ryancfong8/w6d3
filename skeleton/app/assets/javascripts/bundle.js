@@ -96,10 +96,10 @@ $( () => {
 const APIUtil = __webpack_require__(2);
 
 class FollowToggle {
-  constructor(el) {
+  constructor(el, options) {
     this.$el = $(el);
-    this.userId = this.$el.attr("data-user-id");
-    this.followState = this.$el.attr("data-initial-follow-state");
+    this.userId = this.$el.attr("data-user-id") || options.userId;
+    this.followState = this.$el.attr("data-initial-follow-state") || options.followState;
     this.render();
     this.$el.on("click", this.handleClick.bind(this));
   }
@@ -184,6 +184,7 @@ module.exports = APIUtil;
 /***/ (function(module, exports, __webpack_require__) {
 
 const APIUtil = __webpack_require__(2);
+const FollowToggle = __webpack_require__(1);
 
 class UsersSearch {
   constructor (el) {
@@ -204,7 +205,11 @@ class UsersSearch {
     users.forEach((user) => {
       let $li = $("<li>");
       $li.append(`<a href= /users/${user.id}>${user.username}</a>`);
+      let $button = $("<button>");
+      new FollowToggle($button, {userId: user.id, followState: user.followed ? "followed" : "unfollowed" });
+      $li.append($button);
       this.ul.append($li);
+
     });
   }
 }
