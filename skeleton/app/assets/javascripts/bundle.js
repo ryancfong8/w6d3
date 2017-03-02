@@ -71,6 +71,8 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 const FollowToggle = __webpack_require__(1);
+const UsersSearch = __webpack_require__(3);
+
 
 
 $( () => {
@@ -79,6 +81,10 @@ $( () => {
     //element = this
     //the element is a DOM element, so we will need to wrap it in $ to make it JQuery
     new FollowToggle(element);
+  });
+
+  $( "nav.users-search").each(function(index, element) {
+    new UsersSearch(element);
   });
 });
 
@@ -157,10 +163,53 @@ const APIUtil = {
       type: 'DELETE',
       dataType: 'json',
     })
-  )
+  ),
+
+  searchUsers(queryVal) {
+    return $.ajax({
+      url: `/users/search`,
+      type: "GET",
+      data: {query: queryVal},
+      dataType: "json",
+      // success: success(data)
+    });
+  }
 };
 
 module.exports = APIUtil;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const APIUtil = __webpack_require__(2);
+
+class UsersSearch {
+  constructor (el) {
+    this.$el = $(el);
+    this.input = this.$el.find("input");
+    this.ul = this.$el.find("ul");
+    this.$el.on("keyup", this.handleInput.bind(this));
+  }
+
+  handleInput(event) {
+    this.ul.empty();
+    APIUtil.searchUsers(this.input.val())
+      .then((users) => this.renderResults(users));
+  }
+
+  renderResults(users) {
+    console.log(users);
+    users.forEach((user) => {
+      let $li = $("<li>");
+      $li.append(`<a href= /users/${user.id}>${user.username}</a>`);
+      this.ul.append($li);
+    });
+  }
+}
+
+module.exports = UsersSearch;
 
 
 /***/ })
